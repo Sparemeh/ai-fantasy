@@ -8,6 +8,27 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Separator } from "@/components/ui/separator";
 import { ImageUpload } from "@/components/image-upload";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Wand2 } from "lucide-react";
+
+const PREAMBLE = `You are a fictional character named Asturian, the medieval fantasy king of Asturia. You are a brave and ambitious ruler who deeply cares about the well-being of your people and the prosperity of your kingdom. Your speech is eloquent and noble, reflecting your royal status. You strive to protect your people, expand your kingdom's influence, and ensure justice and fairness in your realm. You are currently speaking to someone who is curious about your reign, values, and the challenges of ruling a medieval kingdom.`;
+
+const SEED_CHAT = `Human: Greetings, King Asturian. How fares the kingdom of Asturia?
+Asturian: Greetings, traveler. Asturia thrives under the light of justice and the toil of its noble people. Our granaries are full, our armies are strong, and our artisans craft wonders to rival the heavens. Pray, tell me what brings you to my court.
+
+Human: Your kingdom sounds splendid. What are your greatest challenges as a ruler?
+Asturian: Ah, ruling a kingdom is no simple task. The balance between ambition and prudence must be carefully struck. We contend with neighboring realms, unpredictable harvests, and the delicate task of maintaining the trust of my people. Yet, these challenges only steel my resolve to serve them better.
+
+Human: How do you ensure the well-being of your people?
+Asturian: By placing their needs above all else. I consult wise councilors, foster trade to enrich our markets, and ensure justice is swift and fair. I walk among my people, hear their grievances, and take their counsel to heart. A king is but the servant of his realm, after all.
+
+Human: You must be proud of your kingdom. What are your ambitions for Asturia?
+Asturian: Indeed, I am. Yet, my ambitions are not born of pride alone but of duty. I dream of uniting the fractured lands, forging alliances, and building a legacy of peace and prosperity. Through strength, wisdom, and the blessings of the gods, I shall see Asturia shine as a beacon for all.`;
+
+
+
 
 interface CharacterFormProps {
     initialData: Character | null;
@@ -106,17 +127,69 @@ export const CharacterForm = ({
                             </FormItem>
                         )}/>
                         <FormField name="categoryId" control={form.control} render={({ field }) => (
-                            <FormItem className="col-span-2 md:col-span-1 ">
-                                <FormLabel>Description</FormLabel>
-                                <FormControl className="bg-primary/">
-                                    <Input disabled={isLoading} placeholder="The great king of Asturia" {...field}/>
-                                </FormControl>
+                            <FormItem>
+                                <FormLabel> Category </FormLabel>
+                                <Select disabled={isLoading} onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
+                                    <FormControl>
+                                        <SelectTrigger className="bg-primary-foreground">
+                                            <SelectValue defaultValue={field.value} placeholder="Select a Category"/>
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {categories.map((category) => (
+                                            <SelectItem key={category.id} value={category.id}>
+                                                {category.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                                 <FormDescription>
-                                    Describe briefly who your character is!
+                                    Select a category for you Character!
                                 </FormDescription>
                                 <FormMessage />
                             </FormItem>
                         )}/>
+                    </div>
+                    <div className="space-y-2 w-full">
+                        <div>
+                            <h3 className="text-lg font-medium">
+                                Configuration
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                                Detailed Instruction for AI Behaviour
+                            </p>
+                        </div>
+                        <Separator className="bg-primary/10"/>
+                    </div>
+                    <FormField name="instructions" control={form.control} render={({ field }) => (
+                        <FormItem className="col-span-2 md:col-span-1 ">
+                            <FormLabel>Instructions</FormLabel>
+                            <FormControl className="bg-primary/">
+                                <Textarea className="bg-background resize-none" rows={7} disabled={isLoading} placeholder={PREAMBLE} {...field}/>
+                            </FormControl>
+                            <FormDescription>
+                                Describe in your character&apos;s backstory, personality, etc in great details.
+                            </FormDescription>
+                            <FormMessage />
+                        </FormItem>
+                    )}/>
+                    <FormField name="seed" control={form.control} render={({ field }) => (
+                        <FormItem className="col-span-2 md:col-span-1 ">
+                            <FormLabel>Example Conversation</FormLabel>
+                            <FormControl className="bg-primary/">
+                                <Textarea className="bg-background resize-none" rows={7} disabled={isLoading} placeholder={SEED_CHAT} {...field}/>
+                            </FormControl>
+                            <FormDescription>
+                                Give an example conversation to better configure your AI character!
+                            </FormDescription>
+                            <FormMessage />
+                        </FormItem>
+                    )}/>
+                    <div className="w-full flex justify-center">
+                        <Button size="lg" disabled={isLoading}>
+                            {initialData ? "Edit your companion" : "Create your companion"}
+                            <Wand2 className="w-4 h-4 ml-2"/>
+                        </Button>
                     </div>
                 </form>
             </Form>
