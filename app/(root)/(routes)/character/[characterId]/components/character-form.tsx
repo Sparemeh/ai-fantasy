@@ -1,5 +1,6 @@
 "use client";
 
+import axios from "axios";
 import * as z from "zod";
 import { Category, Character } from "@prisma/client";
 import { useForm } from "react-hook-form";
@@ -12,6 +13,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Wand2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 const PREAMBLE = `You are a fictional character named Asturian, the medieval fantasy king of Asturia. You are a brave and ambitious ruler who deeply cares about the well-being of your people and the prosperity of your kingdom. Your speech is eloquent and noble, reflecting your royal status. You strive to protect your people, expand your kingdom's influence, and ensure justice and fairness in your realm. You are currently speaking to someone who is curious about your reign, values, and the challenges of ruling a medieval kingdom.`;
 
@@ -60,6 +63,9 @@ export const CharacterForm = ({
     categories,
     initialData
 }: CharacterFormProps) => {
+    const router = useRouter();
+    const { toast } = useToast();
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: initialData || {
@@ -75,7 +81,27 @@ export const CharacterForm = ({
     const isLoading = form.formState.isSubmitting;
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        console.log(values);
+        try {
+            if (initialData) {
+                // Update character functionality
+                await axios.patch(`/api/character/${initialData.id}`, values); 
+            } else {
+                // Create character functionality
+                await axios.post("/api/character", values);
+            }
+
+            toast({
+                description: "Success."
+            });
+
+            router.refresh();
+            router.push("/");
+        } catch (error) {
+            toast({
+                variant: "destructive",
+                description: "Something went wrong",
+            });
+        }
     }
 
     return (
