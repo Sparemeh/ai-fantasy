@@ -11,7 +11,7 @@ export const Sidebar = () => {
     const routes = [
         {
             icon: Home,
-            href: "/",
+            href: "/dashboard",
             label: "Home",
             pro: false,
         },

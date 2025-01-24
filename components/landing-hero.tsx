@@ -23,6 +23,7 @@ export const LandingHero = () => {
                     <TypeWriterComponent options={{
                         strings: [
                             "Worlds.",
+                            "Stories.",
                             "Characters.",
                             "Cities.",
                             "Creatures.",

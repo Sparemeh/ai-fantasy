@@ -1,5 +1,5 @@
 import prismadb from "@/lib/prismadb";
-import { currentUser } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 export async function PATCH(
@@ -45,6 +45,35 @@ export async function PATCH(
 
     } catch (error) {
         console.log("[CHARACTER_PATCH]", error);
+        return new NextResponse("Internal Error", { status: 500 });
+    }
+}
+
+export async function DELETE (
+    request: Request,
+    { params }: { params:  { characterId: string } }
+) {
+    try {
+        // Await the result of the `auth()` function
+        const authResult = await auth();
+
+        // Extract the userId from the auth result
+        const userId = authResult?.userId;
+
+        if (!userId) {
+            return new NextResponse("Unauthorized", { status: 401 });
+        }
+
+        const character = await prismadb.character.delete({
+            where: {
+                userId,
+                id: params.characterId,
+            }
+        });
+
+        return NextResponse.json(character);
+    } catch (error) {
+        console.log("[COMPANION_DELETE]", error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }
