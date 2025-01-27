@@ -7,11 +7,11 @@ import { ChatClient } from "./components/client";
 interface ChatIDPageProps {
     params: {
         chatId: string;
-    }
+    };
 }
 
 const ChatIdPage = async ({ params }: ChatIDPageProps) => {
-    const { chatId } = await params;
+    const { chatId } = params;
     const { userId, redirectToSignIn } = await auth();
 
     if (!userId) {
