@@ -157,7 +157,7 @@ export const CharacterForm = ({
                                 <FormLabel> Category </FormLabel>
                                 <Select disabled={isLoading} onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
                                     <FormControl>
-                                        <SelectTrigger className="bg-primary-foreground">
+                                        <SelectTrigger className="bg-primary/">
                                             <SelectValue defaultValue={field.value} placeholder="Select a Category"/>
                                         </SelectTrigger>
                                     </FormControl>

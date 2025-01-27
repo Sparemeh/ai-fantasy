@@ -13,6 +13,7 @@ interface CharacterIdPageProps {
 const CharacterIdPage = async ({
     params
 }: CharacterIdPageProps) => {
+    const { characterId } = await params;
     const { userId, redirectToSignIn } = await auth();
     // TODO: Check Subscription
 
@@ -24,7 +25,7 @@ const CharacterIdPage = async ({
 
     const character = await prismadb.character.findUnique({
         where: {
-            id: params.characterId,
+            id: characterId,
             userId
         }
     });

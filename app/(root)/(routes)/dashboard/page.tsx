@@ -12,8 +12,10 @@ interface RootPageProps {
 
 const RootPage = async ({ searchParams }: RootPageProps) => {
     // Extract categoryId and name
-    const categoryId = searchParams?.categoryId || undefined;
-    const name = searchParams?.name || undefined;
+    const { categoryId } = await searchParams;
+    const { name } = await searchParams;
+    // const categoryId = searchParams?.categoryId || undefined;
+    // const name = searchParams?.name || undefined;
 
     const data = await prismadb.character.findMany({
         where: {
