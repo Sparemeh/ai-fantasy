@@ -5,13 +5,13 @@ import { ChatClient } from "./components/client";
 
 
 interface ChatIDPageProps {
-    params: {
+    params: Promise<{
         chatId: string;
-    };
+    }>;
 }
 
 const ChatIdPage = async ({ params }: ChatIDPageProps) => {
-    
+    const { chatId } = await params;
     const { userId, redirectToSignIn } = await auth();
 
     if (!userId) {
@@ -20,7 +20,7 @@ const ChatIdPage = async ({ params }: ChatIDPageProps) => {
 
     const character = await prismadb.character.findUnique({
         where: {
-            id: params.chatId,
+            id: chatId,
         },
         include: {
             messages: {
