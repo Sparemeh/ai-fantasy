@@ -4,16 +4,14 @@ import { NextResponse } from "next/server";
 
 export async function PATCH(
     req: Request,
-    context: { params:  { characterId: string } }
+    { params }: { params:  { characterId: string } }
 ) {
     try {
         const body = await req.json();
         const user = await currentUser();
         const { src, name, description, instructions, seed, categoryId } = body;
 
-        const { characterId } = context.params;
-
-        if (!characterId) {
+        if (!params.characterId) {
             return new NextResponse("Companion ID is required", { status: 400});
         }
 
@@ -29,7 +27,7 @@ export async function PATCH(
 
         const character = await prismadb.character.update({
             where: {
-                id: characterId,
+                id: params.characterId,
                 userId: user.id,
             },
             data: {
@@ -52,13 +50,11 @@ export async function PATCH(
     }
 }
 
-
 export async function DELETE(
     request: Request,
-    context: { params: { characterId: string } }
+    { params }: { params: { characterId: string } }
 ) {
     try {
-        const { characterId } = context.params;
         // Await the result of the `auth()` function
         const authResult = await auth();
 
@@ -72,7 +68,7 @@ export async function DELETE(
         const character = await prismadb.character.delete({
             where: {
                 userId,
-                id: characterId,
+                id: params.characterId,
             }
         });
 
