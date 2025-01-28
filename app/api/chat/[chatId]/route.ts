@@ -121,7 +121,7 @@ export async function POST(
         // const response = resp.replaceAll(",", "");
         // const chunks = cleaned.split("\n");
         // const response = chunks[0];
-        const response = completion.choices[0].message.content?.replaceAll(",", "");
+        const response = completion.choices[0].message.content?.replaceAll(",", "") || "No response";
         await memoryManager.writeToHistory("" + response.trim(), characterKey);
 
         const result = streamText({
