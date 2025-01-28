@@ -52,7 +52,7 @@ export async function PATCH(
 
 export async function DELETE(
     request: Request,
-    { params }: { params: { characterId: string } }
+    { params }: { params: Promise<{ characterId: string }> }
 ) {
     try {
         // Await the result of the `auth()` function
