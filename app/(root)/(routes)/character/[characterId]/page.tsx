@@ -3,9 +3,9 @@ import { CharacterForm } from "./components/character-form";
 import { auth } from "@clerk/nextjs/server";
 
 interface CharacterIdPageProps {
-    params: {
+    params: Promise<{
         characterId: string;
-    };
+    }>;
 };
 
 
