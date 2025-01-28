@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 export async function PATCH(
     req: Request,
-    { params }: { params:  { characterId: string } }
+    { params }: { params:  Promise<{ characterId: string }> }
 ) {
     try {
         const body = await req.json();
