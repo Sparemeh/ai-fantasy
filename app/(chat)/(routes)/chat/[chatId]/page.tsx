@@ -11,7 +11,7 @@ interface ChatIDPageProps {
 }
 
 const ChatIdPage = async ({ params }: ChatIDPageProps) => {
-    const { chatId } = await params;
+    
     const { userId, redirectToSignIn } = await auth();
 
     if (!userId) {
@@ -20,7 +20,7 @@ const ChatIdPage = async ({ params }: ChatIDPageProps) => {
 
     const character = await prismadb.character.findUnique({
         where: {
-            id: chatId,
+            id: params.chatId,
         },
         include: {
             messages: {
