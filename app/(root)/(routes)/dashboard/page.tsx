@@ -4,10 +4,10 @@ import { SearchInput } from "@/components/search-input";
 import prismadb from "@/lib/prismadb";
 
 interface RootPageProps {
-    searchParams: {
+    searchParams: Promise<{
         categoryId?: string; // Made optional to handle undefined cases
         name?: string;       // Made optional for similar reasons
-    }
+    }>;
 }
 
 const RootPage = async ({ searchParams }: RootPageProps) => {
