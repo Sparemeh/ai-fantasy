@@ -41,6 +41,9 @@ export const ChatClient = ({ character }: ChatClientProps) => {
 
             router.refresh();
         },
+        onError(error) {
+            console.error("Chat error", error)
+        },
     });
 
     const onSubmit = (e: FormEvent<HTMLFormElement>) => {

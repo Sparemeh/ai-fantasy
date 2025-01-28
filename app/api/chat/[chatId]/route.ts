@@ -1,11 +1,13 @@
-import { streamText , LangChainAdapter  } from "ai";
-import { auth, currentUser } from "@clerk/nextjs/server";
-import { Replicate } from "@langchain/community/llms/replicate";
+import { streamText  } from "ai";
+import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 import { MemoryManager } from "@/lib/memory";
 import { rateLimit } from "@/lib/rate-limit";
 import prismadb from "@/lib/prismadb";
+import OpenAI from "openai";
+import { deepseek } from '@ai-sdk/deepseek';
+
 
 export async function POST(
     request: Request,
@@ -52,7 +54,7 @@ export async function POST(
         const characterKey = {
             characterName: name,
             userId: user.id,
-            modelName: "llama2-13b"
+            modelName: "deepseek-chat"
         };
 
         const memoryManager = await MemoryManager.getInstance();
@@ -77,53 +79,64 @@ export async function POST(
             relevantHistory = similarDocs.map((doc) => doc.pageContent).join("\n");
         }
 
-
-
-        const model = new Replicate({
-            model: "a16z-infra/llama13b-v2-chat:df7690f1994d94e96ad9d568eac121aecf50684a0b0963b25a41cc40061269e5",
-            input: {
-                max_length: 2048
-            },
-            apiKey: process.env.REPLICATE_API_TOKEN 
+        const openai = new OpenAI({
+            baseURL: 'https://api.deepseek.com',
+            apiKey: process.env.DEEPSEEK_API_KEY
         });
 
+        const completion = await openai.chat.completions.create({
+            messages: [
+                {
+                    role: "system",
+                    content: `
+                        ONLY generate plain sentences without prefix of who is speaking. DO NOT use ${name}: prefix.
 
-        model.verbose = true;
+                        ${character.instructions}
 
-        const resp = String(
-            await model.invoke(
-                `
-                ONLY generate plain sentences without prefix of who is speaking. DO NOT use ${name}: prefix.
+                        Below are the relevant details about ${name}'s past and the conversation you are in.
+                        ${relevantHistory}
 
-                ${character.instructions}
+                        ${recentChatHistory}\n${name}:
+                        `
+                }
+            ],
+            model: "deepseek-chat"
+        });
 
-                Below are the relevant details about ${name}'s past and the conversation you are in.
-                ${relevantHistory}
+        // const resp = String(
+        //     await model.invoke(
+        //         `
+        //         ONLY generate plain sentences without prefix of who is speaking. DO NOT use ${name}: prefix.
 
-                ${recentChatHistory}\n${name}:
-                `
-            ).catch(console.error)
-        );
+        //         ${character.instructions}
 
-        const response = resp.replaceAll(",", "");
+        //         Below are the relevant details about ${name}'s past and the conversation you are in.
+        //         ${relevantHistory}
+
+        //         ${recentChatHistory}\n${name}:
+        //         `
+        //     ).catch(console.error)
+        // );
+
+        // const response = resp.replaceAll(",", "");
         // const chunks = cleaned.split("\n");
         // const response = chunks[0];
-
+        const response = completion.choices[0].message.content?.replaceAll(",", "");
         await memoryManager.writeToHistory("" + response.trim(), characterKey);
 
-        var Readable = require("stream").Readable;
+        const result = streamText({
+            model: deepseek("deepseek-chat"),
+            prompt: `
+                    ONLY generate plain sentences without prefix of who is speaking. DO NOT use ${name}: prefix.
 
+                    ${character.instructions}
 
-        let s = new Readable();
-        s.push(response);
-        s.push(null);
+                    Below are the relevant details about ${name}'s past and the conversation you are in.
+                    ${relevantHistory}
 
-        // const webReadableStream = new ReadableStream({
-        //     start(controller) {
-        //         controller.enqueue(new TextEncoder().encode(response)); // Encode response
-        //         controller.close(); // Signal the stream is done
-        //     },
-        // });
+                    ${recentChatHistory}\n${name}:
+                    `
+        });
 
         if (response !== undefined && response.length > 1) {
             memoryManager.writeToHistory("" + response.trim(), characterKey);
@@ -144,7 +157,7 @@ export async function POST(
             })
         };
 
-        return LangChainAdapter.toDataStreamResponse(s);
+        return result.toDataStreamResponse();
 
 
     } catch (error) {

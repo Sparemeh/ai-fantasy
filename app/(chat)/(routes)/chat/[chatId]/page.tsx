@@ -11,7 +11,7 @@ interface ChatIDPageProps {
 }
 
 const ChatIdPage = async ({ params }: ChatIDPageProps) => {
-    const { chatId } = params;
+    const { chatId } = await params;
     const { userId, redirectToSignIn } = await auth();
 
     if (!userId) {
