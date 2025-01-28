@@ -3,7 +3,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 export async function PATCH(
-    req:Request,
+    req: Request,
     { params }: { params:  { characterId: string } }
 ) {
     try {
