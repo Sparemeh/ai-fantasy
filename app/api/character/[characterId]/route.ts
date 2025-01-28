@@ -50,9 +50,9 @@ export async function PATCH(
     }
 }
 
-export async function DELETE (
+export async function DELETE(
     request: Request,
-    { params }: { params:  { characterId: string } }
+    { params }: { params: { characterId: string } }
 ) {
     try {
         // Await the result of the `auth()` function
